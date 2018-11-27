@@ -1,0 +1,5 @@
+
+<launch>
+  <node name="joy_node" pkg="joy" type="joy_node" />
+  <node name="psoc_ros_serial" pkg="beginner_ugv" type="psoc_ros_serial" output="screen" />
+</launch>
