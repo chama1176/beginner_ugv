@@ -10,8 +10,8 @@
 #include <string>
 #include "sensor_msgs/Joy.h"
 
-//std::string dev("/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0");
-std::string dev("/dev/ttyUSB0");
+std::string dev("/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0");
+//std::string dev("/dev/ttyUSB0");
 boost::asio::io_service io;
 boost::asio::serial_port port(io, dev);
 //std::string send_data;
