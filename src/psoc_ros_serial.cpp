@@ -13,10 +13,33 @@
 std::string dev("/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0");
 //std::string dev("/dev/ttyUSB0");
 boost::asio::io_service io;
+boost::asio::streambuf sb;
 boost::asio::serial_port port(io, dev);
 //std::string send_data;
+enum flush_type
+{
+  flush_receive = TCIFLUSH,
+  flush_send = TCOFLUSH,
+  flush_both = TCIOFLUSH
+};
+void flush_serial_port(
+  boost::asio::serial_port& serial_port,
+  flush_type what,
+  boost::system::error_code& error)
+{
+  if (0 == ::tcflush(serial_port.lowest_layer().native_handle(), what))
+  {
+    error = boost::system::error_code();
+  }
+  else
+  {
+    error = boost::system::error_code(errno,
+        boost::asio::error::get_system_category());
+  }
+}
 
 void joy_callback(const sensor_msgs::Joy& joy_msg){
+	boost::system::error_code ec;
 	int vel[2] = {};
 
     vel[0] =joy_msg.axes[1] * 100;
@@ -26,6 +49,21 @@ void joy_callback(const sensor_msgs::Joy& joy_msg){
 	//std::cout << std::to_string(vel[0]) << "," << std::to_string(vel[1]) << std::endl;
 	ROS_INFO("%s",send_data.c_str());
 	boost::asio::write(port, boost::asio::buffer(send_data));
+
+	flush_serial_port(port, flush_both, ec);
+	boost::asio::read_until(port, sb, "\r\n");
+	std::istream is(&sb);
+	std::string rxed;
+	std::getline(is, rxed);
+	std::vector<std::string> rx_vals;
+	boost::algorithm::split(rx_vals, rxed, boost::is_any_of(","));
+	ROS_INFO("%d %s", (int)rx_vals.size(), rxed.c_str());
+	//while(!ec){
+	//	boost::asio::read(port, sb, boost::asio::transfer_at_least(1));	
+	//}
+	//int len = port.read_some(boost::asio::buffer(sb));
+	//sb[len] = '\0';]
+	
 }
 
 int main(int argc, char **argv){
