@@ -68,7 +68,6 @@ void joy_callback(const sensor_msgs::Joy& joy_msg){
 
 int main(int argc, char **argv){
 
-//	std::string dev("/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0");
 	long baud(57600);
 
 	ros::init(argc, argv, "psoc_ros_serial");
